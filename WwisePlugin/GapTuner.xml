@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the
+"Apache License"); you may not use this file except in compliance with the
+Apache License. You may obtain a copy of the Apache License at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Copyright (c) 2022 Audiokinetic Inc.
+-->
+<!--
+See https://www.audiokinetic.com/library/edge/?source=SDK&id=plugin__xml.html
+for the documentation about the plugin xml format
+-->
+<PluginModule>
+  <EffectPlugin Name="GapTuner" CompanyID="64" PluginID="5092">
+    <PluginInfo>
+      <PlatformSupport>
+        <Platform Name="Any">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+      </PlatformSupport>
+    </PluginInfo>
+    <Properties>
+		
+      <!-- Property definitions -->
+
+		<Reference Name="OutputPitchParameterReference" DisplayName="Output Pitch Parameter Reference" DisplayGroup="Output Pitch">
+			<AudioEnginePropertyID>0</AudioEnginePropertyID>
+			<Restrictions>
+				<TypeEnumerationRestriction>
+					<Type Name="GameParameter" />
+				</TypeEnumerationRestriction>
+			</Restrictions>
+		</Reference>
+		
+		<Property Name="OutputPitchParameterID" Type="Uint32" DisplayName="Output Pitch Parameter ID" DisplayGroup="Output Pitch">
+			<DefaultValue>0</DefaultValue>
+			<AudioEnginePropertyID>1</AudioEnginePropertyID>
+		</Property>
+
+		<Property Name="WindowSize" Type="Uint32" DisplayName="Window Size" DisplayGroup="Analysis Settings">
+			<DefaultValue>2048</DefaultValue>
+			<AudioEnginePropertyID>2</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Enumeration Type="Uint32">
+						<Value DisplayName="128">128</Value>
+						<Value DisplayName="256">256</Value>
+						<Value DisplayName="512">512</Value>
+						<Value DisplayName="1024">1024</Value>
+						<Value DisplayName="2048">2048</Value>
+						<Value DisplayName="4096">4096</Value>
+					</Enumeration>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+
+		<Property Name="MaxNumKeyMaxima" Type="Uint32" DisplayName="Max Num Key Maxima" DisplayGroup="Analysis Settings">
+			<DefaultValue>8</DefaultValue>
+			<AudioEnginePropertyID>3</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Range Type="Uint32">
+						<Min>1</Min>
+						<Max>16</Max>
+					</Range>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+
+		<Property Name="KeyMaximaThresholdMultiplier" Type="Real32" DisplayName="Key Maxima Threshold Multiplier" DisplayGroup="Analysis Settings">
+			<UserInterface Step="0.01" Fine="0.001" Decimals="3" UIMin="0" UIMax="1"/>
+			<DefaultValue>0.9</DefaultValue>
+			<AudioEnginePropertyID>4</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Range Type="Real32">
+						<Min>0.0</Min>
+						<Max>1.0</Max>
+					</Range>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+
+		<Property Name="ClarityThresholdMultiplier" Type="Real32" DisplayName="Clarity Threshold Multiplier" DisplayGroup="Analysis Settings">
+			<UserInterface Step="0.01" Fine="0.001" Decimals="3" UIMin="0" UIMax="1"/>
+			<DefaultValue>0.8</DefaultValue>
+			<AudioEnginePropertyID>5</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Range Type="Real32">
+						<Min>0.0</Min>
+						<Max>1.0</Max>
+					</Range>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+
+		<Property Name="DownsamplingFactor" Type="Uint32" DisplayName="Downsampling Factor" DisplayGroup="Analysis Settings">
+			<DefaultValue>2</DefaultValue>
+			<AudioEnginePropertyID>6</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Enumeration Type="Uint32">
+						<Value DisplayName="1">1</Value>
+						<Value DisplayName="2">2</Value>
+						<Value DisplayName="4">4</Value>
+						<Value DisplayName="8">8</Value>
+						<Value DisplayName="16">16</Value>
+						<Value DisplayName="32">32</Value>
+					</Enumeration>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+
+		<Property Name="SmoothingRateMs" Type="Uint32" DisplayName="Smoothing Rate (ms)" DisplayGroup="Smoothing">
+			<DefaultValue>0</DefaultValue>
+			<AudioEnginePropertyID>7</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Range Type="Uint32">
+						<Min>0</Min>
+						<Max>2000</Max>
+					</Range>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+
+		<Property Name="SmoothingCurve" Type="Uint32" DisplayName="Smoothing Curve" DisplayGroup="Smoothing">
+			<UserInterface DropDown="CurveIn" />
+			<DefaultValue>5</DefaultValue>
+			<AudioEnginePropertyID>8</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Enumeration Type="Uint32">
+						<Value DisplayName="Logarithmic (Base 3)">0</Value>
+						<Value DisplayName="Sine">1</Value>
+						<Value DisplayName="Logarithmic (Base 1.41)">2</Value>
+						<Value DisplayName="Inverted S-Curve">3</Value>
+						<Value DisplayName="Linear">4</Value>
+						<Value DisplayName="S-Curve">5</Value>
+						<Value DisplayName="Exponential (Base 1.41)">6</Value>
+						<Value DisplayName="Reciprocal Sine">7</Value>
+						<Value DisplayName="Exponential (Base 3)">8</Value>
+					</Enumeration>
+				</ValueRestriction>
+			</Restrictions>
+		</Property>
+		
+    </Properties>
+  </EffectPlugin>
+</PluginModule>
