@@ -178,10 +178,10 @@ void GapTunerFX::Execute(AkAudioBuffer* InOutBuffer)
     
     AkRtpcValue OutputPitchParamValue = 0.f;
 
-    // Set to best maxima frequency
+    // Set parameter value to best maxima frequency
     OutputPitchParamValue = BestMaximaFrequency;
 
-    // Set RTPC with interpolation
+    // Setup smoothing/interpolation
     AK::IAkGlobalPluginContext* GlobalContext =
       m_PluginContext->GlobalContext();
 
@@ -192,10 +192,27 @@ void GapTunerFX::Execute(AkAudioBuffer* InOutBuffer)
     const uint32_t SmoothingRateMs =
       m_PluginParams->NonRTPC.SmoothingRateMs;
 
+    // Get the game object ID for the game object on which this
+    // plugin instance is instantiated.
+    //
+    // We default to an invalid ID, which corresponds to setting the
+    // parameter value at the global scope.
+    AkGameObjectID GameObjectId = AK_INVALID_GAME_OBJECT;
+
+    const auto* GameObjectInfo =
+        m_PluginContext->GetGameObjectInfo();
+
+    if (GameObjectInfo)
+    {
+        GameObjectId =
+            GameObjectInfo->GetGameObjectID();
+    }
+
+    // Set RTPC
     AKRESULT Result =
       GlobalContext->SetRTPCValue(OutputPitchParamId,
                                   OutputPitchParamValue,
-                                  AK_INVALID_GAME_OBJECT,
+                                  GameObjectId,
                                   SmoothingRateMs,
                                   SmoothingCurve,
                                   false);
