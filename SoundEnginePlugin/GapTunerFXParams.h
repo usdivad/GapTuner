@@ -42,8 +42,10 @@ static const AkPluginParamID PARAM_CLARITY_THRESHOLD_ID = 5;
 static const AkPluginParamID PARAM_DOWNSAMPLING_FACTOR = 6;
 static const AkPluginParamID PARAM_SMOOTHING_RATE_MS_ID = 7;
 static const AkPluginParamID PARAM_SMOOTHING_CURVE_ID = 8;
+static const AkPluginParamID PARAM_ZERO_OUT_UNPITCHED_ID = 9;
+static const AkPluginParamID PARAM_UNPITCHED_COOLDOWN_MS_ID = 10;
 
-static const AkUInt32 NUM_PARAMS = 9;
+static const AkUInt32 NUM_PARAMS = 11;
 
 struct GapTunerRTPCParams
 {
@@ -59,6 +61,8 @@ struct GapTunerNonRTPCParams
   AkUInt32 DownsamplingFactor;
   AkUInt32 SmoothingRateMs;
   AkUInt32 SmoothingCurve; // As enum
+  bool     ZeroOutUnpitched;
+  AkUInt32 UnpitchedCooldownMs;
 };
 
 struct GapTunerFXParams

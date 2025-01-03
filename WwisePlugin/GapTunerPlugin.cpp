@@ -81,6 +81,12 @@ bool GapTunerPlugin::GetBankParameters(
   in_dataWriter.WriteUInt32(m_propertySet.GetUInt32(
     in_guidPlatform, "SmoothingCurve"));
 
+  in_dataWriter.WriteBool(m_propertySet.GetBool(
+      in_guidPlatform, "ZeroOutUnpitched"));
+
+  in_dataWriter.WriteUInt32(m_propertySet.GetUInt32(
+      in_guidPlatform, "UnpitchedCooldownMs"));
+
   return true;
 }
 
