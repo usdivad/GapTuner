@@ -172,7 +172,7 @@ for the documentation about the plugin xml format
 		</Property>
       
 		<Property Name="UnpitchedCooldownMs" Type="Uint32" DisplayName="Unpitched Input Cooldown (ms)" DisplayGroup="Unpitched Input">
-			<DefaultValue>50</DefaultValue>
+			<DefaultValue>80</DefaultValue>
 			<AudioEnginePropertyID>10</AudioEnginePropertyID>
 			<Restrictions>
 				<ValueRestriction>

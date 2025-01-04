@@ -65,7 +65,7 @@ AKRESULT GapTunerFXParams::Init(AK::IAkPluginMemAlloc* in_pAllocator,
       NonRTPC.SmoothingRateMs = 0;
       NonRTPC.SmoothingCurve = 0;
       NonRTPC.ZeroOutUnpitched = false;
-      NonRTPC.UnpitchedCooldownMs = 50;
+      NonRTPC.UnpitchedCooldownMs = 80;
       
       m_paramChangeHandler.SetAllParamChanges();
       return AK_Success;
