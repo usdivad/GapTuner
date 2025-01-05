@@ -1,6 +1,6 @@
 # GapTuner
 
-<img src="Assets/Screenshots/GapTunerUI.png" width="800"/>
+<img src="Assets/Screenshots/GapTunerUI.png" width="600"/>
 
 GapTuner is a real-time monophonic pitch tracker implemented as a Wwise effect plugin.
 
