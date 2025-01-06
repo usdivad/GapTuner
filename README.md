@@ -14,7 +14,7 @@ Add a GapTuner instance in your effects chain and set the **Output Pitch Paramet
 
 <img src="Assets/Screenshots/GapTunerRTPC.png" width="800"/>
 
-The plugin consists of three categories of parameters:
+The plugin consists of four categories of parameters:
 1. **Output Pitch**
 	- **Output Pitch Parameter Reference:** A reference to the output pitch RTPC. This allows you to browse to a specific RTPC in your project within Wwise authoring.
 	- **Output Pitch Parameter ID:** The ID of the output pitch RTPC. This gets populated automatically when you set the Output Pitch Parameter Reference, but you can also set this manually if you'd like.
@@ -27,6 +27,9 @@ The plugin consists of three categories of parameters:
 3. **Smoothing**
 	- **Smoothing Rate (ms):** Interpolation rate for setting the output pitch parameter value. Higher values result in increased responsiveness at the cost of decreased smoothness.
 	- **Smoothing Curve:** Curve to use for interpolating the output pitch parameter value.
+5. **Unpitched Input**
+	- **Zero Out Unpitched Input:** Whether to set the output pitch value to 0 when unpitched input is detected. Useful for scenarios where input frequently switches between pitched and unpitched (e.g. vocalized notes with breaths in between).
+	- **Unpitched Input Cooldown (ms):** How long unpitched input must be sustained before the output pitch value gets set to 0. Only applies if Zero Out Unpitched Input is set to true.
 
 
 ## Setup
