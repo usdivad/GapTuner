@@ -2,7 +2,7 @@
 // for the documentation about the bundle_template.json format
 {
     // Unique identifier of this bundle. Id must be unique across all existing plugins and versions.
-    "id": "David Su.GapTuner.1_1_0_5005",
+    "id": "David Su.GapTuner.1_1_0_5005.${year}_${major}_${minor}_${build}",
 
     // Name displayed in the Wwise Launcher for this bundle
     "name": "GapTuner",
