@@ -65,6 +65,18 @@
         //     "url": string // Target URL of this link
         // },
         // ...
+
+        {
+            "displayName": "More Info",
+            "id": "GapTuner_Link_MoreInfo",
+            "url": "https://github.com/usdivad/GapTuner"
+        },
+
+        {
+            "displayName": "Online Documentation",
+            "id": "GapTuner_Link_OnlineDocumentation",
+            "url": "https://github.com/usdivad/GapTuner/blob/master/README.md"
+        }
     ],
 
     // Local documentation files for this bundle
