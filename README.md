@@ -34,15 +34,33 @@ The plugin consists of four categories of parameters:
 
 ## Setup
 
-The following instructions are for Wwise authoring -- for information on building and packaging for various platforms, see the Wwise documentation on [building](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=effectplugin_tools_building.html) and [packaging](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=effectplugin_tools_packaging.html) effect plugins.
+### Step 1: Download/build plugin binaries
+
+#### Option A: Download
+
+You can download pre-compiled binaries from the [releases page](https://github.com/usdivad/GapTuner/releases). These include binaries for the Authoring and Windows platforms, for Wwise versions 2022.1, 2023.1, and 2024.1. For other platforms or Wwise versions, see Option B below.
+
+#### Option B: Build
+
+The following instructions are for the Authoring platform with the [vc170 toolset](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=reference_platform.html) (i.e. Visual Studio 2022, toolset vc143) -- for information on building and packaging for various platforms, see the Wwise documentation on [building](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=effectplugin_tools_building.html) and [packaging](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=effectplugin_tools_packaging.html) effect plugins.
 
 1. Download [RapidJSON](https://github.com/Tencent/rapidjson) and place the `include` directory in `Libraries/rapidjson` (so that you should have a `Libraries/rapidjson/include/rapidjson` directory)
 2. Premake: `python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" premake Authoring`
-3. Open GapTuner_Authoring_Windows_vc160.sln and apply project settings:
-	- Retarget both GapTuner and GapTunerFX projects to the latest Windows SDK version (e.g. 10.0)
+3. Open GapTuner_Authoring_Windows_vc170.sln and apply project settings:
+	- Retarget both GapTuner and GapTunerFX projects to the latest Windows SDK version (e.g. 10.0) if necessary
 	- (optional) To enable debugging via attaching to Wwise Authoring, set: Properties > C/C++ > Optimization > `Disabled (/Od)`
-5. Build: `python "%WWISEROOT%/Scripts/Build/Plugins/wp.py" build Authoring -c Release -x x64 -t vc160` (or directly via Visual Studio)
+5. Build: `python "%WWISEROOT%/Scripts/Build/Plugins/wp.py" build Authoring -c Release -x x64 -t vc170` (or directly via Visual Studio)
+
+
+### Step 2: Install via the Audiokinetic Launcher
+
+1. Navigate to the **Plug-Ins** tab
+2. Under **Install New Plug-Ins**, select **Add from directory**
+3. Select the directory that contains the plugin binaries from Step 1
 
 ## Licensing
 
 This work is licensed under the [MIT License](LICENSE), except for Wwise plugin scaffolding portions, which are licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+## Contact
+Please [get in touch](hello@usdivad.com) if you end up making any cool stuff using this, as well as if you have any questions, comments, or suggestions!
