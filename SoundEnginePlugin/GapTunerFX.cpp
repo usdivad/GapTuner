@@ -83,11 +83,18 @@ AKRESULT GapTunerFX::Init(AK::IAkPluginMemAlloc* InAllocator,
   m_FftIn.resize(FftWindowSize);
   m_FftOut.resize(FftWindowSize);
 
+  // ----
+  // Reset cooldown book-keeping
+  m_UnpitchedTimeElapsedMs = 0;
+
   return AK_Success;
 }
 
 AKRESULT GapTunerFX::Term(AK::IAkPluginMemAlloc* InAllocator)
 {
+  // Zero-out output pitch so that we don't get a "dangling" value
+  SetOutputPitchParameterValue(static_cast<AkRtpcValue>(0.f));
+
   AK_PLUGIN_DELETE(InAllocator, this);
   return AK_Success;
 }
@@ -166,40 +173,50 @@ void GapTunerFX::Execute(AkAudioBuffer* InOutBuffer)
   // ----
   // Set output parameters
 
-  // Only set parameter if clarity exceeds threshold
+  // Pitch prediction is only considered pitched (as opposed to
+  // unpitched) if clarity exceeds threshold
   const float ClarityThreshold =
     m_PluginParams->NonRTPC.ClarityThreshold;
-  
-  bool bSetRtpc = BestMaximaCorrelation > ClarityThreshold;
+  const bool bPitched =
+    BestMaximaCorrelation > ClarityThreshold;
+
+  // Update unpitched book-keeping
+  if (bPitched)
+  {
+    m_UnpitchedTimeElapsedMs = 0;
+  }
+  else
+  {
+    const float TimeElapsedSeconds =
+      static_cast<float>(InOutBuffer->uValidFrames) / m_SampleRate;
+    const uint32_t TimeElapsedMs =
+      static_cast<uint32_t>(TimeElapsedSeconds * 1000);
+
+    m_UnpitchedTimeElapsedMs += TimeElapsedMs;
+  }
+
+  // Determine whether we've reached the invalid pitch cooldown
+  const bool bZeroOutUnpitched =
+    m_PluginParams->NonRTPC.ZeroOutUnpitched;
+  const uint32_t UnpitchedCooldownMs =
+    m_PluginParams->NonRTPC.UnpitchedCooldownMs;
+  const bool bUnpitchedReachedCooldown =
+    m_UnpitchedTimeElapsedMs >= UnpitchedCooldownMs;
+
+  // Set the output pitch parameter if conditions are met
+  const bool bSetRtpc =
+    bPitched || (bZeroOutUnpitched && bUnpitchedReachedCooldown);
+
   if (bSetRtpc)
   {
-    AkRtpcID OutputPitchParamId =
-      m_PluginParams->NonRTPC.OutputPitchParameterId;
-    
-    AkRtpcValue OutputPitchParamValue = 0.f;
+    const AkRtpcValue OutputPitchParameterValue =
+      static_cast<AkRtpcValue>(bPitched ?
+                               BestMaximaFrequency :
+                               0.f);
 
-    // Set to best maxima frequency
-    OutputPitchParamValue = BestMaximaFrequency;
-
-    // Set RTPC with interpolation
-    AK::IAkGlobalPluginContext* GlobalContext =
-      m_PluginContext->GlobalContext();
-
-    const auto SmoothingCurve = 
-      static_cast<AkCurveInterpolation>(
-        m_PluginParams->NonRTPC.SmoothingCurve);
-
-    const uint32_t SmoothingRateMs =
-      m_PluginParams->NonRTPC.SmoothingRateMs;
-
-    AKRESULT Result =
-      GlobalContext->SetRTPCValue(OutputPitchParamId,
-                                  OutputPitchParamValue,
-                                  AK_INVALID_GAME_OBJECT,
-                                  SmoothingRateMs,
-                                  SmoothingCurve,
-                                  false);
+    SetOutputPitchParameterValue(OutputPitchParameterValue);
   }
+
 }
 
 // -----------------------------------------------------------------------------
@@ -209,6 +226,54 @@ uint32_t GapTunerFX::GetWindowSize() const
   return m_PluginParams->NonRTPC.WindowSize /
          m_PluginParams->NonRTPC.DownsamplingFactor;
 }
+
+// -----------------------------------------------------------------------------
+
+AKRESULT GapTunerFX::SetOutputPitchParameterValue(
+  AkRtpcValue InOutputPitchParameterValue)
+{
+  // Get the parameter ID
+  AkRtpcID OutputPitchParameterId =
+    m_PluginParams->NonRTPC.OutputPitchParameterId;
+
+  // Setup smoothing/interpolation
+  AK::IAkGlobalPluginContext* GlobalContext =
+    m_PluginContext->GlobalContext();
+
+  const auto SmoothingCurve =
+    static_cast<AkCurveInterpolation>(
+      m_PluginParams->NonRTPC.SmoothingCurve);
+
+  const uint32_t SmoothingRateMs =
+    m_PluginParams->NonRTPC.SmoothingRateMs;
+
+  // Get the game object ID for the game object on which this
+  // plugin instance is instantiated.
+  //
+  // We default to an invalid ID, which corresponds to setting the
+  // parameter value at the global scope.
+  AkGameObjectID GameObjectId = AK_INVALID_GAME_OBJECT;
+
+  const auto* GameObjectInfo =
+    m_PluginContext->GetGameObjectInfo();
+
+  if (GameObjectInfo)
+  {
+    GameObjectId = GameObjectInfo->GetGameObjectID();
+  }
+
+  // Set the RTPC value
+  AKRESULT Result =
+    GlobalContext->SetRTPCValue(OutputPitchParameterId,
+                                InOutputPitchParameterValue,
+                                GameObjectId,
+                                SmoothingRateMs,
+                                SmoothingCurve,
+                                false);
+
+  return Result;
+}
+
 
 // -----------------------------------------------------------------------------
 

@@ -97,6 +97,10 @@ private:
   // Get our actual window size, taking downsampling into account
   uint32_t GetWindowSize() const;
 
+  // Set the value of our output pitch RTPC
+  AKRESULT SetOutputPitchParameterValue(
+    AkRtpcValue InOutputPitchParamValue);
+
   // ----------------
 
   // Wwise-plugin-specific members, set in Init()
@@ -106,6 +110,10 @@ private:
 
   // Sample rate, also set in Init()
   uint32_t m_SampleRate { 48000 };
+
+  // How long (in ms) we've been unable to make a valid pitch
+  // prediction for
+  uint32_t m_UnpitchedTimeElapsedMs { 0 };
 
   // ----------------
   // Analysis members
@@ -123,6 +131,7 @@ private:
   std::vector<float> m_KeyMaximaLags { };
   std::vector<float> m_KeyMaximaCorrelations { };
 
+  // FFT
   std::vector<std::complex<double>> m_FftIn { };
   std::vector<std::complex<double>> m_FftOut { };
 };

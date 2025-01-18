@@ -165,6 +165,33 @@ for the documentation about the plugin xml format
 				</ValueRestriction>
 			</Restrictions>
 		</Property>
+
+		<Property Name="ZeroOutUnpitched" Type="bool" DisplayName="Zero Out Unpitched Input" DisplayGroup="Unpitched Input">
+			<DefaultValue>false</DefaultValue>
+			<AudioEnginePropertyID>9</AudioEnginePropertyID>
+		</Property>
+      
+		<Property Name="UnpitchedCooldownMs" Type="Uint32" DisplayName="Unpitched Input Cooldown (ms)" DisplayGroup="Unpitched Input">
+			<DefaultValue>80</DefaultValue>
+			<AudioEnginePropertyID>10</AudioEnginePropertyID>
+			<Restrictions>
+				<ValueRestriction>
+					<Range Type="Uint32">
+						<Min>0</Min>
+						<Max>2000</Max>
+					</Range>
+				</ValueRestriction>
+			</Restrictions>
+      <Dependencies>
+        <PropertyDependency Name="ZeroOutUnpitched" Action="Enable">
+          <Condition>
+            <Enumeration Type="bool">
+              <Value>true</Value>
+            </Enumeration>
+          </Condition>
+        </PropertyDependency>
+      </Dependencies>
+		</Property>
 		
     </Properties>
   </EffectPlugin>

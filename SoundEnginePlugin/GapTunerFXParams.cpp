@@ -64,6 +64,8 @@ AKRESULT GapTunerFXParams::Init(AK::IAkPluginMemAlloc* in_pAllocator,
       NonRTPC.DownsamplingFactor = 2;
       NonRTPC.SmoothingRateMs = 0;
       NonRTPC.SmoothingCurve = 0;
+      NonRTPC.ZeroOutUnpitched = false;
+      NonRTPC.UnpitchedCooldownMs = 80;
       
       m_paramChangeHandler.SetAllParamChanges();
       return AK_Success;
@@ -107,6 +109,12 @@ AKRESULT GapTunerFXParams::SetParamsBlock(const void* in_pParamsBlock,
                                                         pParamsBlock,
                                                         in_ulBlockSize);
   NonRTPC.SmoothingCurve =                 READBANKDATA(AkUInt32,
+                                                        pParamsBlock,
+                                                        in_ulBlockSize);
+  NonRTPC.ZeroOutUnpitched =               READBANKDATA(bool,
+                                                        pParamsBlock,
+                                                        in_ulBlockSize);
+  NonRTPC.UnpitchedCooldownMs =            READBANKDATA(AkUInt32,
                                                         pParamsBlock,
                                                         in_ulBlockSize);
 
@@ -158,6 +166,14 @@ AKRESULT GapTunerFXParams::SetParam(AkPluginParamID in_paramID,
       NonRTPC.SmoothingCurve = *((AkUInt32*)in_pValue);
       m_paramChangeHandler.SetParamChange(PARAM_SMOOTHING_CURVE_ID);
       break;
+    case PARAM_ZERO_OUT_UNPITCHED_ID:
+        NonRTPC.ZeroOutUnpitched = *((bool*)in_pValue);
+        m_paramChangeHandler.SetParamChange(PARAM_ZERO_OUT_UNPITCHED_ID);
+        break;
+    case PARAM_UNPITCHED_COOLDOWN_MS_ID:
+        NonRTPC.UnpitchedCooldownMs = *((AkUInt32*)in_pValue);
+        m_paramChangeHandler.SetParamChange(PARAM_UNPITCHED_COOLDOWN_MS_ID);
+        break;
     default:
       eResult = AK_InvalidParameter;
       break;
