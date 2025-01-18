@@ -1,6 +1,13 @@
 # GapTuner
 
-<img src="Assets/Screenshots/GapTunerUI.png" width="600"/>
+<a href="https://youtu.be/vSNP8Qiqbjc">
+	<img src="Assets/Screenshots/GapTunerDiziDemo.png" width="800"/>
+	<br/>
+	Demo video
+</a>
+
+
+## Overview
 
 GapTuner is a real-time monophonic pitch tracker implemented as a Wwise effect plugin.
 
@@ -10,9 +17,11 @@ If you're interested in seeing some of these pitch tracking concepts in action, 
 
 ## Usage
 
+<img src="Assets/Screenshots/GapTunerUI.png" width="500"/>
+
 Add a GapTuner instance in your effects chain and set the **Output Pitch Parameter Reference** to an RTPC of your choice. The RTPC value will now track the pitch of incoming audio to the plugin:
 
-<img src="Assets/Screenshots/GapTunerRTPC.png" width="800"/>
+<img src="Assets/Screenshots/GapTunerRTPC.png" width="600"/>
 
 The plugin consists of four categories of parameters:
 1. **Output Pitch**
@@ -32,7 +41,7 @@ The plugin consists of four categories of parameters:
 	- **Unpitched Input Cooldown (ms):** How long unpitched input must be sustained before the output pitch value gets set to 0. Only applies if Zero Out Unpitched Input is set to true.
 
 
-## Setup
+## Installation
 
 ### Step 1: Download/build plugin binaries
 
@@ -57,6 +66,11 @@ The following instructions are for the Authoring platform with the [vc170 toolse
 1. Navigate to the **Plug-Ins** tab
 2. Under **Install New Plug-Ins**, select **Add from directory**
 3. Select the directory that contains the plugin binaries from Step 1
+4. Under **Choose Plug-Ins**, select GapTuner (it may already be auto-selected)
+5. Press **Install**
+
+After the installation completes, once you navigate to the **Plug-Ins** tab you should see GapTuner under **Installed Plug-Ins**:
+<img src="Assets/Screenshots/GapTunerInstalled.png" width="700"/>
 
 ## Licensing
 
@@ -64,3 +78,4 @@ This work is licensed under the [MIT License](LICENSE), except for Wwise plugin 
 
 ## Contact
 Please [get in touch](hello@usdivad.com) if you end up making any cool stuff using this, as well as if you have any questions, comments, or suggestions!
+``
