@@ -15,8 +15,8 @@ by Jonathan Dupuy
 #include <complex>  // std::complex
 #include <vector>   // std::vector
 
-#include <AK/SoundEngine/Common/IAkPluginMemAlloc.h> // AkPluginArrayAllocator
-#include <AK/Tools/Common/AkArray.h> // AkArray
+#include <AK/SoundEngine/Common/IAkPluginMemAlloc.h>  // AkPluginArrayAllocator
+#include <AK/Tools/Common/AkArray.h>                  // AkArray
 
 #ifndef DJ_ASSERT
 #   include <cassert>
@@ -54,6 +54,9 @@ template<typename T> void fft1d(fft_arg_raw<T>& xi,
                                 const fft_dir& dir,
                                 const uint32_t& sz);
 
+// DS:
+// AkArray FFT argument: AkArray<std::complex, std::complex, AkPluginArrayAllocator>
+template <typename T> using fft_arg_ak = AkArray<std::complex<T>, std::complex<T>, AkPluginArrayAllocator>;
 
 // ----------------------------------------------------------------
 
@@ -100,14 +103,11 @@ template <typename T> void fft1d(const fft_arg<T>& xi,
 // ----------------------------------------------------------------
 
 // DS:
-// Overloaded version of fft1d() that takes in both an input AkArray
-// (xi) and an output AkArray (xo), modifying the output AkArray
-// directly instead of allocating additional memory for a return
-// AkArray.
-template <typename T> void fft1d(
-    const AkArray<std::complex<T>, std::complex<T>, AkPluginArrayAllocator>& xi,
-    AkArray<std::complex<T>, std::complex<T>, AkPluginArrayAllocator>& xo,
-    const fft_dir& dir)
+// Overloaded version of fft1d() that uses AkArrays instead of
+// vectors.
+template <typename T> void fft1d(const fft_arg_ak<T>& xi,
+                                 fft_arg_ak<T>& xo,
+                                 const fft_dir& dir)
 {
     DJ_ASSERT((xi.Length() & (xi.Length() - 1)) == 0 && "invalid input size");
     int cnt = (int)xi.Length();
