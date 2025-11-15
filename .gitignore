@@ -477,3 +477,20 @@ ASALocalRun/
 .localhistory/
 
 # End of https://www.gitignore.io/api/archives,linux,xcode,macos,windows,visualstudio,premake-gmake
+
+# --------------------------------
+# Custom
+
+# Libraries
+Libraries/**/*.h
+Libraries/**/*.cpp
+
+# Xcode
+plugin.entitlements
+*.xcodeproj/
+*.xcworkspace/
+
+# Custom directories
+ForPackaging/
+PackagedPlugin/
+screencaps/
