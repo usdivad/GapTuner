@@ -91,12 +91,13 @@ template <typename T> fft_arg<T> fft1d(const fft_arg<T> &xi, const fft_dir &dir)
 }
 
 /*
+ * DS:
  * Overloaded version of fft1d() that uses raw arrays instead of vectors.
  *
  * This version of the function also takes in xo and modifies it directly,
  * instead of allocating additional memory for a return array.
  */
-template<typename T> void fft1d(fft_arg_raw<T>& xi, fft_arg_raw<T>& xo, const fft_dir& dir, const uint32_t& sz)
+template <typename T> void fft1d(fft_arg_raw<T>& xi, fft_arg_raw<T>& xo, const fft_dir& dir, const uint32_t& sz)
 {
     DJ_ASSERT((sz & (sz - 1)) == 0 && "invalid input size");
     int cnt = (int)sz;

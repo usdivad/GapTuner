@@ -60,12 +60,14 @@ AKRESULT GapTunerFX::Init(AK::IAkPluginMemAlloc* InAllocator,
   // Allocate memory for analysis window
   const uint32_t WindowSize = GetWindowSize();
 
-  m_AutocorrelationCoefficients.resize(WindowSize);
+  m_AutocorrelationCoefficients.Init(m_PluginMemoryAllocator);
+  m_AutocorrelationCoefficients.Resize(WindowSize);
 
   // The circular buffer sets its internal capacity to
   // InCapacity + 1; if we pass in WindowSize - 1, then
   // m_AnalysisWindow.GetCapacity() == WindowSize, which is
   // the result we want
+  m_AnalysisWindow.Init(m_PluginMemoryAllocator);
   m_AnalysisWindow.SetCapacity(WindowSize - 1); 
 
   // ----
@@ -73,15 +75,21 @@ AKRESULT GapTunerFX::Init(AK::IAkPluginMemAlloc* InAllocator,
   const uint32_t MaxNumKeyMaxima =
     m_PluginParams->NonRTPC.MaxNumKeyMaxima;
 
-  m_KeyMaximaLags.resize(MaxNumKeyMaxima);
-  m_KeyMaximaCorrelations.resize(MaxNumKeyMaxima);
+  m_KeyMaximaLags.Init(m_PluginMemoryAllocator);
+  m_KeyMaximaLags.Resize(MaxNumKeyMaxima);
+
+  m_KeyMaximaCorrelations.Init(m_PluginMemoryAllocator);
+  m_KeyMaximaCorrelations.Resize(MaxNumKeyMaxima);
 
   // ----
   // Allocate memory for FFT
   const uint32_t FftWindowSize = WindowSize * 2;
 
-  m_FftIn.resize(FftWindowSize);
-  m_FftOut.resize(FftWindowSize);
+  m_FftIn.Init(m_PluginMemoryAllocator);
+  m_FftIn.Resize(FftWindowSize);
+
+  m_FftOut.Init(m_PluginMemoryAllocator);
+  m_FftOut.Resize(FftWindowSize);
 
   // ----
   // Reset cooldown book-keeping

@@ -15,6 +15,9 @@ by Jonathan Dupuy
 #include <complex>  // std::complex
 #include <vector>   // std::vector
 
+#include <AK/SoundEngine/Common/IAkPluginMemAlloc.h> // AkPluginArrayAllocator
+#include <AK/Tools/Common/AkArray.h> // AkArray
+
 #ifndef DJ_ASSERT
 #   include <cassert>
 #   define DJ_ASSERT(x) assert(x)
@@ -43,6 +46,7 @@ fft_arg<float> fft1d_gpu_glready(const fft_arg<float> &xi, const fft_dir &dir);
 fft_arg<float> fft2d_gpu_glready(const fft_arg<float> &xi, const fft_dir &dir);
 fft_arg<float> fft3d_gpu_glready(const fft_arg<float> &xi, const fft_dir &dir);
 
+// DS:
 // Raw array FFT routines
 template <typename T> using fft_arg_raw = std::complex<T>*;
 template<typename T> void fft1d(fft_arg_raw<T>& xi,
@@ -53,6 +57,7 @@ template<typename T> void fft1d(fft_arg_raw<T>& xi,
 
 // ----------------------------------------------------------------
 
+// DS:
 // Overloaded version of fft1d() that takes in both an input vector
 // (xi) and an output vector (xo), modifying the output vector
 // directly instead of allocating additional memory for a return
@@ -84,6 +89,49 @@ template <typename T> void fft1d(const fft_arg<T>& xi,
               std::polar(T(1), ang * T(i1 ^ bw)); // left wing rotation
             std::complex<T> z2 =
               std::polar(T(1), ang * T(i2 ^ bw)); // right wing rotation
+            std::complex<T> tmp = xo[i1];
+
+            xo[i1] += z1 * xo[i2];
+            xo[i2] = tmp + z2 * xo[i2];
+        }
+    }
+}
+
+// ----------------------------------------------------------------
+
+// DS:
+// Overloaded version of fft1d() that takes in both an input AkArray
+// (xi) and an output AkArray (xo), modifying the output AkArray
+// directly instead of allocating additional memory for a return
+// AkArray.
+template <typename T> void fft1d(
+    const AkArray<std::complex<T>, std::complex<T>, AkPluginArrayAllocator>& xi,
+    AkArray<std::complex<T>, std::complex<T>, AkPluginArrayAllocator>& xo,
+    const fft_dir& dir)
+{
+    DJ_ASSERT((xi.Length() & (xi.Length() - 1)) == 0 && "invalid input size");
+    int cnt = (int)xi.Length();
+    int msb = findMSB(cnt);
+    T nrm = T(1) / std::sqrt(T(cnt));
+
+    // pre-process the input data
+    for (int j = 0; j < cnt; ++j)
+        xo[j] = nrm * xi[bitr(j, msb)];
+
+    // fft passes
+    for (int i = 0; i < msb; ++i) {
+        int bm = 1 << i; // butterfly mask
+        int bw = 2 << i; // butterfly width
+        T ang = T(dir) * M_PI / T(bm); // precomputation
+
+        // fft butterflies
+        for (int j = 0; j < (cnt / 2); ++j) {
+            int i1 = ((j >> i) << (i + 1)) + j % bm; // left wing
+            int i2 = i1 ^ bm;                        // right wing
+            std::complex<T> z1 =
+                std::polar(T(1), ang * T(i1 ^ bw)); // left wing rotation
+            std::complex<T> z2 =
+                std::polar(T(1), ang * T(i2 ^ bw)); // right wing rotation
             std::complex<T> tmp = xo[i1];
 
             xo[i1] += z1 * xo[i2];
