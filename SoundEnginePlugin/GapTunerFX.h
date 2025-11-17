@@ -37,6 +37,7 @@ the specific language governing permissions and limitations under the License.
 
 // AK
 #include <AK/SoundEngine/Common/IAkPlugin.h>
+#include <AK/Tools/Common/AkArray.h>
 
 // CircularAudioBuffer
 #include "CircularAudioBuffer/CircularAudioBuffer.h"
@@ -125,13 +126,13 @@ private:
   uint32_t m_AnalysisWindowSamplesWritten { 0 };
 
   // Calculated autocorrelation coefficients
-  std::vector<float> m_AutocorrelationCoefficients { };
+  AkArray<float, float, AkPluginArrayAllocator> m_AutocorrelationCoefficients { };
 
   // Key maxima lags and correlations, for MPM-based peak-picking
-  std::vector<float> m_KeyMaximaLags { };
-  std::vector<float> m_KeyMaximaCorrelations { };
+  AkArray<float, float, AkPluginArrayAllocator> m_KeyMaximaLags { };
+  AkArray<float, float, AkPluginArrayAllocator> m_KeyMaximaCorrelations { };
 
   // FFT
-  std::vector<std::complex<double>> m_FftIn { };
-  std::vector<std::complex<double>> m_FftOut { };
+  AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator> m_FftIn { };
+  AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator> m_FftOut { };
 };

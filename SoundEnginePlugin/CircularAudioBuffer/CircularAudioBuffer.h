@@ -9,8 +9,9 @@
 
 #include <algorithm>
 #include <atomic>
-#include <vector>
 
+#include <AK/SoundEngine/Common/IAkPluginMemAlloc.h> // DS: Add IAkPluginMemAlloc include for AkPluginArrayAllocator 
+#include <AK/Tools/Common/AkArray.h> // DS: Replaced vector include with AkArray include
 
 // Circular audio buffer class.
 template <typename SampleType>
@@ -20,10 +21,11 @@ class CircularAudioBuffer
   // See Section 7.5.1 of Game Audio Programming Vol 3 for full
   // implementation.
 private:
-  std::vector<SampleType> InternalBuffer;
+  AkArray<SampleType, SampleType, AkPluginArrayAllocator> InternalBuffer; // DS: Replaced std::vector<SampleType> with AkArray<SampleType>
   uint32_t Capacity;
   std::atomic<uint32_t> ReadCounter;
   std::atomic<uint32_t> WriteCounter;
+  bool bInitialized; // DS: Added bInitialized to check for array initialization before allocating memory
 
 public:
   CircularAudioBuffer()
@@ -36,19 +38,30 @@ public:
     SetCapacity(InCapacity);
   }
 
+  // DS: Initialize the internal buffer using the memory allocater that is passed in
+  void Init(AK::IAkPluginMemAlloc* InAllocator)
+  {
+    InternalBuffer.Init(InAllocator);
+    bInitialized = true;
+  }
+
   void SetCapacity(uint32_t InCapacity)
   {
     Capacity = InCapacity + 1;
     ReadCounter.store(0);
     WriteCounter.store(0);
-    InternalBuffer.resize(Capacity);
+
+    if (bInitialized)                  // DS: Added initialization check to make sure array is initialized before allocating memory
+    {
+      InternalBuffer.Resize(Capacity); // DS: Replaced resize() with Resize() since we're using an AkArray
+    }
   }
 
   // Pushes some amount of samples into this circular buffer.
   // Returns the amount of samples read
   uint32_t Push(const SampleType* InBuffer, uint32_t NumSamples)
   {
-    SampleType* DestBuffer = InternalBuffer.data();
+    SampleType* DestBuffer = InternalBuffer.Data(); // DS: Replaced data() with Data() since we're using an AkArray
     const uint32_t ReadIndex = ReadCounter.load();
     const uint32_t WriteIndex = WriteCounter.load();
 
@@ -73,7 +86,7 @@ public:
   // Same as Pop() but does not increment the read counter.
   uint32_t Peek(SampleType* OutBuffer, uint32_t NumSamples) const
   {
-    const SampleType* SrcBuffer = static_cast<const SampleType*>(InternalBuffer.data()); // DS: Added const SampleType* cast
+    const SampleType* SrcBuffer = static_cast<const SampleType*>(InternalBuffer.Data()); // DS: Added const SampleType* cast, replaced data() with Data() since we're using an AkArray
     const uint32_t ReadIndex = ReadCounter.load(); // DS: Replaced uint32 with uint32_t
     const uint32_t WriteIndex = WriteCounter.load(); // DS: Replaced uint32 with uint32_t
 
@@ -185,6 +198,12 @@ public:
   void AlignReadWriteIndices()
   {
     SetNum(0, false);
+  }
+
+  // DS: Return whether the buffer has been initialized yet
+  bool IsInitialized()
+  {
+    return bInitialized;
   }
 
 };

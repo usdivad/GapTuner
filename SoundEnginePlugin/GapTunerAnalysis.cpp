@@ -13,10 +13,10 @@ namespace GapTunerAnalysis
   
   void CalculateAcf(
     const CircularAudioBuffer<float>& InAnalysisWindow,
-    std::vector<float>& OutAutocorrelations)
+      AkArray<float, float, AkPluginArrayAllocator>& OutAutocorrelations)
   {
     assert(
-      InAnalysisWindow.GetCapacity() == OutAutocorrelations.size());
+      InAnalysisWindow.GetCapacity() == OutAutocorrelations.Length());
     
     const size_t WindowSize = InAnalysisWindow.GetCapacity();
 
@@ -65,14 +65,14 @@ namespace GapTunerAnalysis
 
   void CalculateAcf_Fft(
     const CircularAudioBuffer<float>& InAnalysisWindow,
-    std::vector<std::complex<double>>& OutFftInput,
-    std::vector<std::complex<double>>& OutFftOutput,
-    std::vector<float>& OutAutocorrelations)
+    AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& OutFftInput,
+    AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& OutFftOutput,
+    AkArray<float, float, AkPluginArrayAllocator>& OutAutocorrelations)
   {
     // 1. Fill the input array with the contents of the analysis
     //    window, then zero-pad it so that it's twice the window size
     assert(
-      InAnalysisWindow.GetCapacity() == OutAutocorrelations.size());
+      InAnalysisWindow.GetCapacity() == OutAutocorrelations.Length());
 
     const size_t AnalysisWindowSize = InAnalysisWindow.GetCapacity();
 
@@ -137,17 +137,17 @@ namespace GapTunerAnalysis
   }
 
   void CalculateFft(
-    const std::vector<std::complex<double>>& InFftSequence,
-    std::vector<std::complex<double>>& OutFftSequence,
+    const AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& InFftSequence,
+    AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& OutFftSequence,
     const dj::fft_dir InFftDirection)
   {
     dj::fft1d(InFftSequence, OutFftSequence, InFftDirection);
   }
 
   uint32_t FindAcfPeakLag(
-    const std::vector<float>& InAutocorrelations)
+    const AkArray<float, float, AkPluginArrayAllocator>& InAutocorrelations)
   {
-    const size_t WindowSize = InAutocorrelations.size();
+    const size_t WindowSize = InAutocorrelations.Length();
     uint32_t PeakLag = 0;
     float PeakCorr = 0.f;
     bool bReachedFirstZeroCrossing = false;
@@ -177,12 +177,12 @@ namespace GapTunerAnalysis
     return PeakLag;
   }
 
-  uint32_t FindKeyMaxima(std::vector<float>& OutKeyMaximaLags,
-                         std::vector<float>& OutKeyMaximaCorrelations,
-                         const std::vector<float>& InAutocorrelations,
+  uint32_t FindKeyMaxima(AkArray<float, float, AkPluginArrayAllocator>& OutKeyMaximaLags,
+                         AkArray<float, float, AkPluginArrayAllocator>& OutKeyMaximaCorrelations,
+                         const AkArray<float, float, AkPluginArrayAllocator>& InAutocorrelations,
                          const uint32_t InMaxNumMaxima)
   {
-    const size_t WindowSize = InAutocorrelations.size();
+    const size_t WindowSize = InAutocorrelations.Length();
     uint32_t MaximaIdx = 0;
     float MaximaLag = 0.f;
     float MaximaCorr = 0.f;
@@ -246,8 +246,8 @@ namespace GapTunerAnalysis
 
   // Pick the best maxima from key maxima
   uint32_t PickBestMaxima(
-    const std::vector<float>& InKeyMaximaLags,
-    const std::vector<float>& InKeyMaximaCorrelations,
+    const AkArray<float, float, AkPluginArrayAllocator>& InKeyMaximaLags,
+    const AkArray<float, float, AkPluginArrayAllocator>& InKeyMaximaCorrelations,
     const uint32_t InNumKeyMaxima,
     const float InThresholdMultiplier)
   {
@@ -291,9 +291,9 @@ namespace GapTunerAnalysis
 
   float FindInterpolatedMaximaLag(
     const uint32_t InMaximaLag,
-    const std::vector<float>& InAutocorrelations)
+    const AkArray<float, float, AkPluginArrayAllocator>& InAutocorrelations)
   {
-    const size_t WindowSize = InAutocorrelations.size();
+    const size_t WindowSize = InAutocorrelations.Length();
     auto InterpolatedLag = static_cast<float>(InMaximaLag);
 
     // Can't interpolate first or last lag value
@@ -351,6 +351,11 @@ namespace GapTunerAnalysis
     const uint32_t NumChannels = InBuffer->NumChannels();
     const uint32_t NumSamples = InBuffer->uValidFrames;
     uint32_t NumSamplesPushed = 0;
+
+    if (!InOutWindow.IsInitialized())
+    {
+      return NumSamplesPushed;
+    }
 
     // Set analysis window read index to write index, so that we
     // always write as many samples as we have available

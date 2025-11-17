@@ -12,10 +12,10 @@
 // STL
 #include <algorithm>
 #include <complex>
-#include <vector>
 
 // AK
 #include <AK/SoundEngine/Common/IAkPlugin.h>
+#include <AK/Tools/Common/AkArray.h>
 
 // CircularAudioBuffer
 #include "CircularAudioBuffer/CircularAudioBuffer.h"
@@ -31,7 +31,7 @@ namespace GapTunerAnalysis
   // Calculate normalized autocorrelation function for a window
   void CalculateAcf(
     const CircularAudioBuffer<float>& InAnalysisWindow,
-    std::vector<float>& OutAutocorrelations);
+    AkArray<float, float, AkPluginArrayAllocator>& OutAutocorrelations);
 
   // Calculate autocorrelation (using dot product) for a given lag
   float CalculateAcfForLag(
@@ -44,15 +44,15 @@ namespace GapTunerAnalysis
   // Calculate autocorrelation using the FFT
   void CalculateAcf_Fft(
     const CircularAudioBuffer<float>& InAnalysisWindow,
-    std::vector<std::complex<double>>& OutFftInput,
-    std::vector<std::complex<double>>& OutFftOutput,
-    std::vector<float>& OutAutocorrelations);
+    AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& OutFftInput,
+    AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& OutFftOutput,
+    AkArray<float, float, AkPluginArrayAllocator>& OutAutocorrelations);
 
   // Calculate the FFT (forwards or backwards) given an input
   // sequence
   void CalculateFft(
-    const std::vector<std::complex<double>>& InFftSequence,
-    std::vector<std::complex<double>>& OutFftSequence,
+    const AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& InFftSequence,
+    AkArray<std::complex<double>, std::complex<double>, AkPluginArrayAllocator>& OutFftSequence,
     const dj::fft_dir InFftDirection);
 
   // ----------------
@@ -61,28 +61,28 @@ namespace GapTunerAnalysis
   // Pick the peak lag given the autocorrelation coefficients for a
   // series of time lags
   uint32_t FindAcfPeakLag(
-    const std::vector<float>& InAutocorrelations);
+    const AkArray<float, float, AkPluginArrayAllocator>& InAutocorrelations);
 
   // ----------------
   // Peak-picking -- MPM
 
   // Gather a list of key maxima using the MPM's peak-picking process
-  uint32_t FindKeyMaxima(std::vector<float>& OutKeyMaximaLags,
-                         std::vector<float>& OutKeyMaximaCorrelations,
-                         const std::vector<float>& InAutocorrelations,
+  uint32_t FindKeyMaxima(AkArray<float, float, AkPluginArrayAllocator>& OutKeyMaximaLags,
+                         AkArray<float, float, AkPluginArrayAllocator>& OutKeyMaximaCorrelations,
+                         const AkArray<float, float, AkPluginArrayAllocator>& InAutocorrelations,
                          const uint32_t InMaxNumMaxima);
 
   // Pick the best maxima from a list of key maxima
   uint32_t PickBestMaxima(
-    const std::vector<float>& InKeyMaximaLags,
-    const std::vector<float>& InKeyMaximaCorrelations,
+    const AkArray<float, float, AkPluginArrayAllocator>& InKeyMaximaLags,
+    const AkArray<float, float, AkPluginArrayAllocator>& InKeyMaximaCorrelations,
     const uint32_t InNumKeyMaxima,
     const float InThresholdMultiplier);
 
   // Find the interpolated maxima for a given lag
   float FindInterpolatedMaximaLag(
     const uint32_t InMaximaLag,
-    const std::vector<float>& InAutocorrelations);
+    const AkArray<float, float, AkPluginArrayAllocator>& InAutocorrelations);
 
   // ----------------
   // Utilities
